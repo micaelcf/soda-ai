@@ -1,7 +1,8 @@
-"""FastAPI server configuration."""
-
 from pydantic import BaseModel
 from os import getenv
+from dotenv import load_dotenv
+
+load_dotenv()
 
 
 class Settings(BaseModel):
@@ -12,6 +13,7 @@ class Settings(BaseModel):
     # Security settings
     authjwt_secret_key: str = getenv("SECRET_JWT", default="mysupersecretkey")
     database_url: str = getenv("DATABASE_URL", default="sqlite:///database.db")
+    gemini_api_key: str = getenv("GOOGLE_API_KEY", default="your-google-api-key")
 
     # testing: bool = getenv("TESTING", default=False, cast=bool)
 

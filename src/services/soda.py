@@ -1,6 +1,6 @@
 from typing import Optional, Sequence
 
-from sqlmodel import Session, select
+from sqlmodel import Session, col, select
 
 from domain.models.app import AppResponse, ErrorDetail
 from domain.models.customer import Customer
@@ -26,6 +26,18 @@ class SodaService:
     def get_soda_by_id(self, soda_id: int) -> AppResponse[Soda]:
         try:
             soda = self.db_session.get(Soda, soda_id)
+            if not soda:
+                return AppResponse(
+                    error=ErrorDetail(message="Soda not found", cause="not-found")
+                )
+            return AppResponse(data=soda)
+        except Exception as e:
+            return AppResponse(error=ErrorDetail(message=str(e), cause="unknown"))
+
+    def get_soda_by_name(self, name: str) -> AppResponse[Soda]:
+        try:
+            statement = select(Soda).where(col(Soda.name).ilike(f"%{name}%"))
+            soda = self.db_session.exec(statement).first()
             if not soda:
                 return AppResponse(
                     error=ErrorDetail(message="Soda not found", cause="not-found")
