@@ -1,0 +1,13 @@
+[project]
+name = "soda-ai"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = [
+    "fastapi[standard]>=0.115.14",
+    "instructor>=1.9.0",
+    "passlib[bcrypt]>=1.7.4",
+    "pyjwt>=2.10.1",
+    "sqlmodel>=0.0.24",
+]
