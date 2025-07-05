@@ -112,7 +112,7 @@ class UserQueryService:
         if action.operation == InventoryOperation.ADD:
             return self.soda_service.create_soda(
                 name=action.soda.name,
-                price=action.soda.price,
+                price=action.soda.price if action.soda.price else 0,
                 quantity=action.soda.quantity,
             )
 

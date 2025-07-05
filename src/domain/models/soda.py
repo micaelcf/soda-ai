@@ -25,7 +25,7 @@ class Soda(SQLModel, table=True):
     price: float = Field(
         # OLD: "Price of the soda"
         # This is ambiguous. Is it the price to set or the current price?
-        description="""The price of a single unit of the soda.""",
+        description="""The price of a single unit of the soda. Must have a value greater than 0.""",
     )
     quantity: int = Field(
         # OLD: "Quantity of the soda"

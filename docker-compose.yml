@@ -1,0 +1,47 @@
+services:
+  # Backend service (FastAPI)
+  backend:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "8000:8000"
+    environment:
+      - ROOT_URL=http://localhost:8000
+      - DATABASE_URL=sqlite:///database.db
+      - SECRET_JWT=mysupersecretkey
+      - GOOGLE_API_KEY=${GOOGLE_API_KEY:-your-google-api-key}
+    volumes:
+      - ./database.db:/app/database.db
+      - ./src:/app/src
+    networks:
+      - soda-network
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8000/')"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+  # Frontend service (React)
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    ports:
+      - "3000:3000"
+    environment:
+      - NODE_ENV=production
+      - REACT_APP_API_URL=http://localhost:8000
+    depends_on:
+      backend:
+        condition: service_healthy
+    networks:
+      - soda-network
+
+networks:
+  soda-network:
+    driver: bridge
+
+volumes:
+  database_data:
