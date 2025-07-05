@@ -5,7 +5,7 @@ from sqlmodel import Field, Relationship, SQLModel
 from pydantic.json_schema import SkipJsonSchema
 
 if TYPE_CHECKING:
-    from .customer import Customer
+    from .customer import CustomerDb
     from .soda import Soda
 
 
@@ -45,4 +45,4 @@ class TransactionCustomer(SQLModel, table=True):
     )
 
     soda: "Soda" = Relationship(back_populates="transactions")
-    customer: "Customer" = Relationship(back_populates="transactions")
+    customer: "CustomerDb" = Relationship(back_populates="transactions")

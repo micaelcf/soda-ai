@@ -122,7 +122,7 @@ class TransactionCustomerService:
                 TransactionCustomer.customer_id == customer_id
             )
             transactions = self.db_session.exec(statement).all()
-            return AppResponse(data=transactions)
+            return AppResponse(data=transactions or [])
         except Exception as e:
             return AppResponse(error=ErrorDetail(message=str(e), cause="unknown"))
 

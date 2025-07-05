@@ -10,9 +10,7 @@ class Soda(SQLModel, table=True):
     id: Optional[int] = Field(
         # OLD: "Incremental ID of the soda, you can reach this number by searching by name and getting the first result"
         # This is confusing for an LLM. It might try to interpret "you can reach..." as a value.
-        description="""The unique database identifier for the soda.
-        **Instruction:** For CREATE actions, leave this field as `None`. The database will assign it automatically. 
-        For READ or UPDATE actions, this field will be populated by the system after finding the soda by name.""",
+        description="""The unique database identifier for the soda.The database will assign it automatically""",
         default=None,
         primary_key=True,
     )
@@ -27,9 +25,7 @@ class Soda(SQLModel, table=True):
     price: float = Field(
         # OLD: "Price of the soda"
         # This is ambiguous. Is it the price to set or the current price?
-        description="""The price of a single unit of the soda. 
-        For CREATE actions, use the price provided by the user. 
-        For READ actions, leave as 0.0 as the system will fetch the current price.""",
+        description="""The price of a single unit of the soda.""",
     )
     quantity: int = Field(
         # OLD: "Quantity of the soda"

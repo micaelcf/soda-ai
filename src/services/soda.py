@@ -3,7 +3,7 @@ from typing import Optional, Sequence
 from sqlmodel import Session, col, select
 
 from domain.models.app import AppResponse, ErrorDetail
-from domain.models.customer import Customer
+from domain.models.customer import CustomerDb
 from domain.models.soda import Soda
 from domain.models.transaction_customer import TransactionCustomer
 from infra.db.sqlite import get_session
@@ -82,16 +82,16 @@ class SodaService:
         except Exception as e:
             return AppResponse(error=ErrorDetail(message=str(e), cause="unknown"))
 
-    def delete_soda(self, soda_id: int) -> AppResponse[bool]:
+    def delete_soda(self, soda_id: int) -> AppResponse[Soda]:
         try:
             soda_response = self.get_soda_by_id(soda_id)
             if soda_response.error:
-                return AppResponse(data=False, error=soda_response.error)
+                return soda_response
 
             soda = soda_response.data
             self.db_session.delete(soda)
             self.db_session.commit()
-            return AppResponse(data=True)
+            return AppResponse(data=soda)
         except Exception as e:
             return AppResponse(error=ErrorDetail(message=str(e), cause="unknown"))
 
@@ -102,8 +102,8 @@ class SodaService:
             statement = (
                 select(Soda)
                 .join(TransactionCustomer)
-                .join(Customer)
-                .where(Customer.id == customer_id)
+                .join(CustomerDb)
+                .where(CustomerDb.id == customer_id)
             )
             sodas = self.db_session.exec(statement).all()
             return AppResponse(data=sodas)

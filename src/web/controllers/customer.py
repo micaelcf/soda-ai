@@ -1,7 +1,10 @@
-from fastapi import APIRouter, HTTPException, status
+import json
+from fastapi import APIRouter, status
 from fastapi.responses import JSONResponse
+from fastapi.encoders import jsonable_encoder
 from pydantic import BaseModel
 
+from domain.models.app import AppResponse
 from services.customer import customer_service
 
 
@@ -18,7 +21,9 @@ class CustomerCreatedResponse(BaseModel):
     id: int | None
 
 
-@router.post("")
+@router.post(
+    "", responses={status.HTTP_400_BAD_REQUEST: {"model": CustomerCreatedResponse}}
+)
 def create_customer(customer: CustomerCreate):
     customer_create_response = customer_service.create_customer(
         name=customer.name, email=customer.email, password=customer.password
@@ -26,9 +31,11 @@ def create_customer(customer: CustomerCreate):
     if not customer_create_response.data:
         return JSONResponse(
             status_code=status.HTTP_400_BAD_REQUEST,
-            content=customer_create_response,
+            content=jsonable_encoder(customer_create_response),
         )
-    return CustomerCreatedResponse(id=customer_create_response.data.id)
+    return AppResponse(
+        data=CustomerCreatedResponse(id=customer_create_response.data.id)
+    )
 
 
 @router.get("")

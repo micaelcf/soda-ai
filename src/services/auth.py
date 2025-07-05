@@ -6,7 +6,7 @@ import jwt
 from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
 
 from config import CONFIG
-from domain.models.customer import Customer
+from domain.models.customer import CustomerDb
 from domain.models.auth import AccessToken, TokenData
 from .customer import customer_service, CustomerService
 from utils.hash import verify_password
@@ -22,7 +22,7 @@ class AuthService:
     def __init__(self, customer_service: CustomerService) -> None:
         self.customer_service = customer_service
 
-    def authenticate_user(self, email: str, password: str) -> Optional[Customer]:
+    def authenticate_user(self, email: str, password: str) -> Optional[CustomerDb]:
         user_response = self.customer_service.get_customer_by_email(email)
         if not user_response.data:
             return None
@@ -45,7 +45,7 @@ class AuthService:
         )
         return AccessToken(token=access_token, exp=exp)
 
-    def validate_token(self, token: AccessToken) -> Optional[Customer]:
+    def validate_token(self, token: AccessToken) -> Optional[CustomerDb]:
         if not token.exp:
             return None
         if token.exp < datetime.now():

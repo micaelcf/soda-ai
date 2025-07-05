@@ -1,28 +1,111 @@
-from typing import TYPE_CHECKING, List, Union
+from enum import Enum
+from typing import List, Union
 from pydantic import BaseModel, Field
 
 # if TYPE_CHECKING:
-from .customer import Customer
+from .customer import CustomerBase
 from .soda import Soda
 from .transaction_customer import TransactionCustomer
 
 
-class Action(BaseModel):
-    type: str = Field(
-        description="The CRUD operation to perform on the target entity (e.g., CREATE for making a new item, READ for finding an item)."
+class UserIntent(str, Enum):
+    PURCHASE = "purchase"
+    MANAGE_INVENTORY = "manage_inventory"
+    CHECK_TRANSACTIONS_HISTORY = "check_transactions_history"
+    GREETING = "greeting"
+    UNSUPPORTED = "unsupported"
+
+
+class PurchaseAction(BaseModel):
+    """
+    Represents a user's intent to purchase one or more sodas.
+    This action is triggered when a user explicitly states they want to buy a product.
+    """
+
+    intent: UserIntent = Field(
+        UserIntent.PURCHASE,
+        description="The user's intent when talking with the vending machine.",
     )
-    target_name: str = Field(
-        description="The class name of the entity being targeted, e.g., 'Soda', 'Customer', 'TransactionCustomer'."
+    soda_name: str = Field(
+        description="The specific type of soda the user wants to buy. The name should be normalized."
     )
-    payload: Customer | Soda | TransactionCustomer = Field(
-        description="""The data payload for the action. 
-        Populate the fields of this entity object based on the user's request, following the specific instructions in each field's description."""
+    quantity: int = Field(
+        default=1,
+        description="The number of sodas the user wants to buy. Defaults to 1 if not specified.",
+        ge=1,
     )
 
 
-class ActionPlan(BaseModel):
-    plan: List[Action] = Field(
-        description="""A sequential list of atomic operations required to fulfill the user's request. 
-        The system will execute these actions in the provided order. 
-        For example, to buy a soda, the plan must first contain a 'READ' action to find the soda by name, followed by a 'CREATE' action for the 'TransactionCustomer' entity.""",
+# INTENT: MANAGE_INVENTORY (New & Expanded)
+
+
+class InventoryOperation(str, Enum):
+    ADD = "add"
+    READ = "read"
+    REMOVE = "remove"
+    UPDATE = "update"
+
+
+class InventoryManagementAction(BaseModel):
+    intent: UserIntent = Field(
+        UserIntent.MANAGE_INVENTORY,
+        description="The operator's intent to manage inventory.",
+    )
+    operation: InventoryOperation = Field(
+        description="""The specific inventory operation to perform, such as 'add', 'read', 'remove' or 'update'.
+        Consider update if you identify the id of the soda (soda already exists). If you see just a name, consider it an add operation.""",
+    )
+    soda: Soda = Field(
+        description="The soda to manage. This should contain a normalized soda name.",
+    )
+
+
+# INTENT: CHECK_TRANSACTIONS_HISTORY (New)
+class TransactionHistoryAction(BaseModel):
+    """
+    Represents a user's request to check transaction history.
+    This can be for a specific customer or for a specific time frame.
+    """
+
+    intent: UserIntent = Field(
+        UserIntent.CHECK_TRANSACTIONS_HISTORY,
+        description="The user's intent to check transaction history.",
+    )
+    customer: CustomerBase = Field(
+        description="The customer whose transaction history is being requested. If you cannot find the customer_id just get the customer name.",
+    )
+
+
+class GeneralAction(BaseModel):
+    """
+    A catch-all for general conversation, greetings, or unsupported requests.
+    This helps the machine respond gracefully to non-transactional input.
+    """
+
+    intent: UserIntent = Field(
+        UserIntent.GREETING,
+        description="The user's general intent, such as a greeting or an unclear/unsupported request.",
+    )
+    message: str = Field(
+        description="Your polite response to the user's message or a note about the unsupported request."
+    )
+
+
+# This Union type is the key. Instructor will try to parse the user message
+# into one of these models.
+class UserActions(BaseModel):
+    """
+    Represents the user's action based on their input.
+    This can be a purchase, inventory check, transaction history request, or general conversation.
+    """
+
+    actions: List[
+        Union[
+            PurchaseAction,
+            InventoryManagementAction,
+            TransactionHistoryAction,
+            GeneralAction,
+        ]
+    ] = Field(
+        description="User's actions based on their input. This is a list because the user can ask multiple things at once."
     )

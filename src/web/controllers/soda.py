@@ -1,6 +1,7 @@
 from typing import Optional
 
 from fastapi import APIRouter, HTTPException, status
+from fastapi.encoders import jsonable_encoder
 from fastapi.responses import JSONResponse
 from pydantic import BaseModel
 
@@ -44,7 +45,7 @@ def get_soda(soda_id: int):
     if not soda_response.data:
         return JSONResponse(
             status_code=status.HTTP_404_NOT_FOUND,
-            content=soda_response,
+            content=jsonable_encoder(soda_response),
         )
     return soda_response
 
@@ -63,7 +64,7 @@ def update_soda(soda_id: int, soda: SodaUpdate):
     if not updated_soda_reponse.data:
         return JSONResponse(
             status_code=status.HTTP_404_NOT_FOUND,
-            content=updated_soda_reponse,
+            content=jsonable_encoder(updated_soda_reponse),
         )
     return updated_soda_reponse
 
@@ -77,7 +78,7 @@ def delete_soda(soda_id: int):
     if not success_response.data:
         return JSONResponse(
             status_code=status.HTTP_404_NOT_FOUND,
-            content=success_response,
+            content=jsonable_encoder(success_response),
         )
     return {"detail": "Soda deleted successfully"}
 

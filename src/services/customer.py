@@ -3,7 +3,7 @@ from typing import List, Optional, Sequence
 from sqlmodel import Session, select
 
 from domain.models.app import AppResponse, ErrorDetail
-from domain.models.customer import Customer
+from domain.models.customer import CustomerBase, CustomerDb
 from infra.db.sqlite import get_session
 from utils.hash import hash_password
 
@@ -15,7 +15,7 @@ class CustomerService:
 
     def create_customer(
         self, name: str, email: str, password: str
-    ) -> AppResponse[Customer]:
+    ) -> AppResponse[CustomerDb]:
         try:
             existing_customer_response = self.get_customer_by_email(email)
             if existing_customer_response.data:
@@ -23,7 +23,7 @@ class CustomerService:
                     error=ErrorDetail(message="Email already exists", cause="conflict")
                 )
 
-            customer = Customer(
+            customer = CustomerDb(
                 name=name, email=email, password=hash_password(password)
             )
             self.db_session.add(customer)
@@ -33,9 +33,9 @@ class CustomerService:
         except Exception as e:
             return AppResponse(error=ErrorDetail(message=str(e), cause="unknown"))
 
-    def get_customer_by_id(self, customer_id: int) -> AppResponse[Customer]:
+    def get_customer_by_id(self, customer_id: int) -> AppResponse[CustomerDb]:
         try:
-            customer = self.db_session.get(Customer, customer_id)
+            customer = self.db_session.get(CustomerDb, customer_id)
             if not customer:
                 return AppResponse(
                     error=ErrorDetail(message="Customer not found", cause="not-found")
@@ -44,25 +44,27 @@ class CustomerService:
         except Exception as e:
             return AppResponse(error=ErrorDetail(message=str(e), cause="unknown"))
 
-    def get_customer_by_email(self, email: str) -> AppResponse[Customer]:
+    def get_customer_by_email(self, email: str) -> AppResponse[CustomerDb]:
         try:
-            statement = select(Customer).where(Customer.email == email)
+            statement = select(CustomerDb).where(CustomerDb.email == email)
             customer = self.db_session.exec(statement).first()
             return AppResponse(data=customer)
         except Exception as e:
             return AppResponse(error=ErrorDetail(message=str(e), cause="unknown"))
 
-    def get_all_customers(self) -> AppResponse[Sequence[Customer]]:
+    def get_all_customers(self) -> AppResponse[Sequence[CustomerBase]]:
         try:
-            statement = select(Customer)
+            statement = select(CustomerDb)
             customers = self.db_session.exec(statement).all()
-            return AppResponse(data=customers)
+            return AppResponse(
+                data=[CustomerBase(**customer.model_dump()) for customer in customers]
+            )
         except Exception as e:
             return AppResponse(error=ErrorDetail(message=str(e), cause="unknown"))
 
     def update_customer(
         self, customer_id: int, name: Optional[str] = None, email: Optional[str] = None
-    ) -> AppResponse[Customer]:
+    ) -> AppResponse[CustomerDb]:
         try:
             customer_response = self.get_customer_by_id(customer_id)
             if customer_response.error:
