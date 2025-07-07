@@ -36,10 +36,6 @@ export default function StockPage() {
     }
   };
 
-  const refreshStock = () => {
-    fetchStock();
-  };
-
   if (loading) {
     return (
       <div className="max-w-6xl mx-auto">
@@ -63,7 +59,7 @@ export default function StockPage() {
           </p>
         </div>
         <button
-          onClick={refreshStock}
+          onClick={fetchStock}
           className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:ring-offset-gray-900 transition-colors"
         >
           🔄 Refresh
@@ -96,42 +92,43 @@ export default function StockPage() {
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-700">
-              {sodas.map((soda) => (
-                <tr
-                  key={soda.id || soda.name}
-                  className="hover:bg-gray-700/50 transition-colors"
-                >
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <div className="flex items-center">
-                      <span className="text-2xl mr-3">🥤</span>
-                      <div>
-                        <div className="text-sm font-medium text-gray-50">
-                          {soda.name}
+              {sodas.map((soda) => {
+                const sodaStatus = getStockStatus(soda.quantity);
+                return (
+                  <tr
+                    key={soda.id || soda.name}
+                    className="hover:bg-gray-700/50 transition-colors"
+                  >
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      <div className="flex items-center">
+                        <span className="text-2xl mr-3">🥤</span>
+                        <div>
+                          <div className="text-sm font-medium text-gray-50">
+                            {soda.name}
+                          </div>
                         </div>
                       </div>
-                    </div>
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <div className="text-sm text-gray-50">
-                      {soda.quantity} units
-                    </div>
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <div className="text-sm text-gray-50">
-                      ${soda.price.toFixed(2)}
-                    </div>
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <span
-                      className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
-                        getStockStatus(soda.quantity).color
-                      }`}
-                    >
-                      {getStockStatus(soda.quantity).status}
-                    </span>
-                  </td>
-                </tr>
-              ))}
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      <div className="text-sm text-gray-50">
+                        {soda.quantity} units
+                      </div>
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      <div className="text-sm text-gray-50">
+                        ${soda.price.toFixed(2)}
+                      </div>
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      <span
+                        className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${sodaStatus.color}`}
+                      >
+                        {sodaStatus.status}
+                      </span>
+                    </td>
+                  </tr>
+                );
+              })}
             </tbody>
           </table>
         </div>

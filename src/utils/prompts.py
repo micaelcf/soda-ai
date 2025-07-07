@@ -38,7 +38,7 @@ def get_system_prompt(
         | "I'm thirsty." | `GeneralAction(intent='unsupported', message="I don't know how to help with that :(")` | Ambiguous request, cannot be mapped to a direct action. |
         | "Do you have water?" | `GeneralAction(intent='unsupported', message='In this vending machine, we only stock soda products :(')` | Request for an unstocked item. |
         | "Give me five" | `GeneralAction(intent='unsupported', message='Five what? I am here to help to buy a tasty soda.')` | Highly ambiguous. |
-        | "Add 50 units of Dr Pepper to the stock." | `InventoryManagementAction(intent='manage_inventory', soda=Soda(name='dr pepper', quantity=50))` | Operator: Explicitly adding stock. |
+        | "Add 50 units of Dr Pepper to the stock." | `InventoryManagementAction(intent='manage_inventory', soda=Soda(name='dr pepper', quantity=50))` | Operator: Explicitly adding soda to stock. |
         | "Set the inventory for fanta to 24 cans." | `InventoryManagementAction(intent='manage_inventory', soda=Soda(name='fanta', quantity=24))` | Operator: Explicitly setting stock. |
         | "How many pepsis are left?" | `InventoryManagementAction(intent='manage_inventory', soda=Soda(name='pepsi', quantity=None))` | Operator/Customer: Checking stock. The `None` quantity signals a query. |
         | "What's the stock level for coke?" | `InventoryManagementAction(intent='manage_inventory', soda=Soda(name='coke', quantity=None))` | Operator/Customer: Checking stock. |

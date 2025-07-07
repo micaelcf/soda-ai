@@ -39,7 +39,8 @@ class TransactionCustomerService:
             if soda.quantity < quantity:
                 return AppResponse(
                     error=ErrorDetail(
-                        message="Insufficient soda quantity", cause="conflict"
+                        message="Not enough soda available for purchase",
+                        cause="conflict",
                     )
                 )
 

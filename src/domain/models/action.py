@@ -56,7 +56,7 @@ class InventoryManagementAction(BaseModel):
         Consider update if you identify the id of the soda (soda already exists). If you see just a name, consider it an add operation.""",
     )
     soda: Soda = Field(
-        description="The soda to manage. This should contain a normalized soda name.",
+        description="The soda to manage. This should contain a normalized soda name. If the soda doesn't exist, the quantity and price should be specified. If the soda already exists, you can specify just the name and the id (if you know it).",
     )
 
 

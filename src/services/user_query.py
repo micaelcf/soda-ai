@@ -65,7 +65,7 @@ class UserQueryService:
                     },
                     {
                         "role": "user",
-                        "content": f"""**Available Soda Names for Normalization:**
+                        "content": f"""**Available Sodas:**
                         {str(available_products_response.data)}"""
                         + f"""**Current customer:**
                         {str(customer)}""",
