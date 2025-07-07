@@ -117,6 +117,23 @@ docker-compose exec frontend sh
 - Vite (development server)
 - Bun (package manager)
 
+## Architecture Diagram
+
+Below is a Mermaid diagram that represents the architecture of the application:
+
+```mermaid
+graph TD
+    A[Frontend - React Application] -->|API Requests| B[Backend - FastAPI Application]
+    B -->|Database Queries| C[SQLite Database]
+    B -->|Uses| D[Google Generative AI]
+    B -->|Exposes| F[API Documentation - Swagger UI]
+
+    subgraph Infrastructure
+        C
+        D
+    end
+```
+
 ## Environment Variables
 
 | Variable         | Description                | Default                 |
